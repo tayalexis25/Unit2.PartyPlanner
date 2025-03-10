@@ -1,0 +1,28 @@
+#parties {
+    display: flex;
+    flex-flow: row wrap;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .parties {
+    flex: 1 1 300px;
+    max-width: 400px;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+  
+  .parties img {
+    max-width: 100%;
+    max-height: auto;
+  }
+
+  body {
+    background-color: blanchedalmond;
+  }
+
+  h1 {
+    text-decoration: underline;
+  }
