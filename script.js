@@ -5,6 +5,12 @@ const state = {
     events: [],
   };
 
+  const eventList = document.querySelector("#partyList");
+  const eventForm = document.querySelector("#partyForm");
+  eventForm.addEventListener("submit", addEvents);
+  eventList.addEventListener("click", deleteEvents);
+
+  //=====GRABBING FROM API======
   async function getEvents() {
     try {
     const response = await fetch(API_URL)
@@ -15,6 +21,14 @@ const state = {
     console.error(error);    
     }
   } 
+//=======RENDERING PT.1=======
+  async function render() {
+    await getEvents();
+    renderEvents();
+}
+
+render();
+
 
   function renderEvents() {
     const eventList = document.querySelector("#parties");
@@ -36,49 +50,83 @@ const state = {
       eventList.replaceChildren(...eventCards);
   }
 
-  
+  //========ADDING EVENT========
   async function addEvents(event) {
       event.preventDefault();
       
-      await createEvents(
-        //   partyform.partyname.value
-        //   location
-        //   date
-        //   description
-        )
-    }
-    // async function createEvent(name, location, date, description)
-    //  try {
-    //     const response = await fetch(API_URL, {
-    //         method: "POST",
-    //         headers: { "Content Type": "application/json" },
-    //         body: JSON.stringify(events),
-    //     });
-    //     const json = await response.json();
-        
-    //     if (json.error) {
-    //         throw new Error(json.error.message);
-    //     }
-    // } catch (error) {
-    //     console.error(error);
-    // }
-    
-    
-    
-    async function render() {
-        await getEvents();
-        renderEvents();
-    }
-    
-    render();
+      const name = document.querySelector("#name").value;
+      const date = new Date(document.querySelector("#date").value);
+      const location = document.querySelector("#location").value;
+      const description = document.querySelector("#description").value;
+     }
 
 
-    const form = document.querySelector("form");
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    const newParty = {
+      name,
+      date,
+      location,
+      description,
+    };
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newParty),
+      });
+      const json = await response.json();
+      console.log(json.data);
+      renderParty(json.data);
+    } catch (error) {
+      console.log(error);
+    }
+
+  //========DELETEING EVENT========
+  async function deleteEvents(event) {
+    if (event.target.classList.contains("delete-button")) {
+      const partyId = event.target.dataset.partyId;
+    console.log(partyId);
+    try {
+      await fetch(`${API_URL}/${partyId}`, {
+        method: "DELETE",
+      });
+      event.target.parentElement.remove();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+//=====RENDERING PT.2======
+function renderEventsList() {
+  state.parties.forEach((event) => {
+    renderParty(event);
+  });
+}
+
+function renderParty(event) {
+  const li = document.createElement("li");
+  li.innerHTML = `
+        <strong>${event.name}</strong><br>
+        Date: ${new Date(event.date).toLocaleDateString()}<br>
+        Location: ${event.location}<br>
+        Description: ${event.description}<br>
+        <button class="delete-button" data-event-id="${
+          event.id
+        }">Delete</button>
+      `;
+  partyList.appendChild(li);
+}
+
+
+    // const form = document.querySelector("form");
+    // form.addEventListener("submit", async (event) => {
+    //     event.preventDefault();
         
         
         
-        await addArtist(events);
-        render();
-    });
+    //     await addArtist(events);
+    //     render();
+    // });
